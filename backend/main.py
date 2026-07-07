@@ -8,7 +8,8 @@ app = FastAPI()
 # Allow the React front-end to talk to this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -41,6 +42,22 @@ def get_years():
     conn.close()
 
     return {"years": [row[0] for row in rows]}
+
+@app.get("/{year}/teams")
+def get_teams(year: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT team_name FROM seasons WHERE season_year = %s ORDER BY team_name",
+        (year,)
+    )
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return {"teams": [row[0] for row in rows]}
 
 @app.get("/{year}/results")
 def get_results(year: int, home: str, away: str):

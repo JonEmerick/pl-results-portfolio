@@ -1,122 +1,92 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css"
 
-function App() {
-  const [count, setCount] = useState(0)
+function App()  {
+  const [years, setYears] = useState([])
+  const [selectedYear, setSelectedYear] = useState("")
+  const [teams, setTeams] = useState([])
+  const [homeTeam, setHomeTeam] = useState("")
+  const [awayTeam, setAwayTeam] = useState("")
+  const [result, setResult] = useState(null)
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/years")
+    .then(res => res.json())
+    .then(data => setYears(data.years))
+  }, [])
+
+useEffect(() => {
+  if (selectedYear) {
+    setHomeTeam("")
+    setAwayTeam("")
+    setResult(null)
+    fetch(`http://127.0.0.1:8000/${selectedYear}/teams`)
+      .then(res => res.json())
+      .then(data => setTeams(data.teams))
+  }
+}, [selectedYear])
+
+useEffect(() => {
+  if (homeTeam && awayTeam) {
+    fetch(`http://127.0.0.1:8000/${selectedYear}/results?home=${homeTeam}&away=${awayTeam}`)
+    .then(res => res.json())
+    .then(data => setResult(data))
+  }
+}, [homeTeam, awayTeam])
+
+return (
+  <div className="app">
+    <h1>Premier League Historic Results</h1>
+
+    <div className="selectors">
+
+        <div className="selector">
+            <label>Season</label>
+            <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)}>
+              <option value="">Select a Season</option>
+              {years.map(year => (
+                <option key ={year} value={year}>{year}/{year + 1}</option>
+              ))}
+            </select>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="selector">
+          <label> Home Team</label>
+          <select value={homeTeam} onChange={e => setHomeTeam(e.target.value)} disabled={!selectedYear}>
+            <option value="">Select home team</option>
+            {teams.map(team => (
+              <option key={team} value={team}>{team}</option>
+            ))}
+          </select>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <div className="selector">
+          <label>Away Team</label>
+          <select value={awayTeam} onChange={e => setAwayTeam(e.target.value)}  disabled={!homeTeam}>
+            <option value="">Select away teams</option>
+            {teams.filter(team => team !== homeTeam).map(team => (
+              <option key={team} value={team}>{team}</option>
+            ))}
+          </select>
+        </div>
+      
+      </div>
+
+      {result && (
+        <div className="result">
+          {result.message ? (
+            <p>{result.message}</p>
+          ):(
+            <div className="scoreline">
+              <span className="team">{result.home_team}</span>
+              <span className="score">{result.home_goals} - {result.away_goals}</span>
+              <span className="team">{result.away_team}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+    </div>
   )
 }
-
 export default App
