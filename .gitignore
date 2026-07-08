@@ -1,0 +1,11 @@
+# Python
+
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variable (If added later)
+.env
+
+# Database credentials - these files contain passwords
+backend/import_data.py

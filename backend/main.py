@@ -17,7 +17,7 @@ app.add_middleware(
 # Database connection details
 DB_NAME = "pl_results"
 DB_USER = "postgres"
-DB_PASSWORD = "Neil_Project"
+DB_PASSWORD = "password"
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
