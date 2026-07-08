@@ -37,6 +37,7 @@ useEffect(() => {
 return (
   <div className="app">
     <h1>Premier League Historic Results</h1>
+    <p className="subtitle">Select a season and two teams to see the result</p>
 
     <div className="selectors">
 
