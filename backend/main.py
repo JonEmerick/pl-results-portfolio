@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.middlerware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from connector import Connector
 
 # Create FastAPI app
@@ -8,7 +8,7 @@ app = FastAPI()
 # Allow the React frontend to talk to this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:6173"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,7 +27,7 @@ def get_teams(year: int):
     rows = connector.fetchTeams(year)
     return {"teams": [row[0] for row in rows]}
 
-@app.get("/{year}/result")
+@app.get("/{year}/results")
 def get_result(year: int, home: str, away: str):
     row = connector.fetchResult(year, home, away)
     if row is None:
