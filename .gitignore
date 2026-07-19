@@ -9,3 +9,4 @@ __pycache__/
 
 # Database credentials - these files contain passwords
 backend/import_data.py
+backend/config.json

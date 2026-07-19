@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #1a06=536;
+  background-color: #1a0536;
   color: #ffffff;
   min-height: 100vh;
 }
@@ -18,7 +18,7 @@ body {
 }
 
 h1 {
-  text-align: centre;
+  text-align: center;
   font-size: 2.2rem;
   color: #ffffff;
   margin-bottom: 10px;
@@ -61,7 +61,7 @@ h1 {
 }
 
 .selector select {
-  padding: 12pc 16px;
+  padding: 12px 16px;
   border-radius: 8px;
   border: 2px solid #3d1a6e;
   background-color: #2a0d4e;

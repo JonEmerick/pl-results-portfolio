@@ -1,81 +1,37 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import psycopg2
+from fastapi.middlerware.cors import CORSMiddleware
+from connector import Connector
 
-# Create the FastAPI app
+# Create FastAPI app
 app = FastAPI()
 
-# Allow the React front-end to talk to this API
+# Allow the React frontend to talk to this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:6173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Database connection details
-DB_NAME = "pl_results"
-DB_USER = "postgres"
-DB_PASSWORD = "password"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-
-def get_db_connection():
-    return psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
+# Inject the connector - this is dependancy injection
+connector = Connector()
 
 @app.get("/years")
 def get_years():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT DISTINCT season_year FROM seasons ORDER BY season_year")
-    rows = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
+    rows = connector.fetchYears()
     return {"years": [row[0] for row in rows]}
 
 @app.get("/{year}/teams")
 def get_teams(year: int):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT team_name FROM seasons WHERE season_year = %s ORDER BY team_name",
-        (year,)
-    )
-    rows = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
+    rows = connector.fetchTeams(year)
     return {"teams": [row[0] for row in rows]}
 
-@app.get("/{year}/results")
-def get_results(year: int, home: str, away: str):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT home_goals, away_goals FROM results WHERE season_year = %s AND home_team = %s AND away_team = %s",
-        (year, home, away)
-    )
-    row = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
+@app.get("/{year}/result")
+def get_result(year: int, home: str, away: str):
+    row = connector.fetchResult(year, home, away)
     if row is None:
-        return {"message": "No result found"}
-
+        return {"message": "Result not found"}
     return {
         "season_year": year,
         "home_team": home,
