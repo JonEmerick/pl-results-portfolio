@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react"
 import "./App.css"
-import APIConnector from "./APIConnector"
 
-const connector = new APIConnector()
-
-function App() {
+function App({ connector }) {
   const [years, setYears] = useState([])
   const [selectedYear, setSelectedYear] = useState("")
   const [teams, setTeams] = useState([])
@@ -13,24 +10,36 @@ function App() {
   const [result, setResult] = useState(null)
 
   useEffect(() => {
-    connector.fetchYears()
-      .then(data => setYears(data.years))
+    const data = connector.fetchYears()
+    if (data.then) {
+      data.then(d => setYears(d.years))
+    } else {
+      setYears(data.years)
+    }
   }, [])
-
+  
   useEffect(() => {
     if (selectedYear) {
       setHomeTeam("")
       setAwayTeam("")
       setResult(null)
-      connector.fetchTeams(selectedYear)
-        .then(data => setTeams(data.teams))
+      const data = connector.fetchTeams(selectedYear)
+      if (data.then) {
+        data.then(d => setTeams(d.teams))
+      } else {
+        setTeams(data.teams)
+      }
     }
   }, [selectedYear])
-
+  
   useEffect(() => {
     if (homeTeam && awayTeam) {
-      connector.fetchResult(selectedYear, homeTeam, awayTeam)
-        .then(data => setResult(data))
+      const data = connector.fetchResult(selectedYear, homeTeam, awayTeam)
+      if (data.then) {
+        data.then(d => setResult(d))
+      } else {
+        setResult(data)
+      }
     }
   }, [homeTeam, awayTeam])
 
