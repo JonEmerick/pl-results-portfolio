@@ -7,7 +7,7 @@ class Connector:
         with open(config_path) as f:
             config = json.load(f)
         self.db_config = config["database"]
-
+    
     def get_connection(self):
         return psycopg2.connect(
             dbname=self.db_config["name"],
@@ -16,38 +16,36 @@ class Connector:
             host=self.db_config["host"],
             port=self.db_config["port"]
         )
-
-    def fetchYears(self):
+    
+    def execute_query(self, sql, params=None, fetch="all"):
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT DISTINCT season_year FROM seasons ORDER BY season_year"
-        )
-        rows = cursor.fetchall()
+        cursor.execute(sql, params)
+        if fetch == "one":
+            result = cursor.fetchone()
+        else:
+            result = cursor.fetchall()
         cursor.close()
         conn.close()
-        return rows
-
+        return result
+    
+    def fetchYears(self):
+        rows = self.execute_query(
+            "SELECT DISTINCT season_year FROM results ORDER BY season_year"
+        )
+        return [row[0] for row in rows]
+    
     def fetchTeams(self, year):
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
+        rows = self.execute_query(
             "SELECT team_name FROM seasons WHERE season_year = %s ORDER BY team_name",
             (year,)
         )
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return rows
-
+        return [row[0] for row in rows]
+    
     def fetchResult(self, year, home, away):
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
+        return self.execute_query(
             "SELECT home_goals, away_goals FROM results WHERE season_year = %s AND home_team = %s AND away_team = %s",
-            (year, home, away)
+            (year, home, away),
+            fetch="one"
         )
-        row = cursor.fetchone()
-        cursor.close()
-        conn.close()
         return row
