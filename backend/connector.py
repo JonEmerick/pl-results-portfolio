@@ -31,7 +31,7 @@ class Connector:
     
     def fetchYears(self):
         rows = self.execute_query(
-            "SELECT DISTINCT season_year FROM results ORDER BY season_year"
+            "SELECT DISTINCT season_year FROM seasons ORDER BY season_year"
         )
         return [row[0] for row in rows]
     
@@ -48,4 +48,3 @@ class Connector:
             (year, home, away),
             fetch="one"
         )
-        return row
