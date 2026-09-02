@@ -1,29 +1,29 @@
 class TestAPIConnector {
 
     fetchYears() {
-        return {
+        return Promise.resolve ({
             years: [1992, 1993, 2022, 2023, 2024]
-        }
+        })
     }
 
     fetchTeams(year) {
-        return {
+        return Promise.resolve ({
             teams: [
                 "Arsenal", "Aston Villa", "Chelsea",
                 "Liverpool", "Man City", "Man United",
                 "Tottenham", "Everton", "Newcastle", "Wolves"
             ]
-        }
+        })
     }
 
     fetchResult(year, home, away) {
-        return {
+        return Promise.resolve ({
             season_year: year,
             home_team: home,
             away_team: away,
             home_goals: 2,
             away_goals: 1
-        }
+        })
     }
 }
 

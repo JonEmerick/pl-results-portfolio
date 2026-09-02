@@ -11,12 +11,8 @@ function App({ connector }) {
   const [result, setResult] = useState(null)
 
   useEffect(() => {
-    const data = connector.fetchYears()
-    if (data.then) {
-      data.then(d => setYears(d.years))
-    } else {
-      setYears(data.years)
-    }
+    connector.fetchYears()
+      .then(data => setYears(data.years))
   }, [])
 
   useEffect(() => {
@@ -24,23 +20,15 @@ function App({ connector }) {
       setHomeTeam("")
       setAwayTeam("")
       setResult(null)
-      const data = connector.fetchTeams(selectedYear)
-      if (data.then) {
-        data.then(d => setTeams(d.teams))
-      } else {
-        setTeams(data.teams)
-      }
+      connector.fetchTeams(selectedYear)
+        .then(data => setTeams(data.teams))
     }
   }, [selectedYear])
 
   useEffect(() => {
     if (homeTeam && awayTeam) {
-      const data = connector.fetchResult(selectedYear, homeTeam, awayTeam)
-      if (data.then) {
-        data.then(d => setResult(d))
-      } else {
-        setResult(data)
-      }
+      connector.fetchResult(selectedYear, homeTeam, awayTeam)
+        .then(data => setResult(data))
     }
   }, [homeTeam, awayTeam])
 
